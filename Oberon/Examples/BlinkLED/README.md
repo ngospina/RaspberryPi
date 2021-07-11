@@ -1,3 +1,4 @@
-# Blink Ok LED
-oberon execute MakeBlinkOkLED.txt
+# Blink OK/ACT LED
+
+oberon execute MakeKernel.txt
 
