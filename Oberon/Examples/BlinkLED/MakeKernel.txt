@@ -1,0 +1,4 @@
+Compiler.Compile -p=ARM BlinkLED.Mod ~
+Compiler.Compile -p=ARM Kernel.Mod ~
+Linker.Link -p=RPI Kernel ~
+FoxARMInstructionSet.Disassemble kernel.img ~

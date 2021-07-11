@@ -1,2 +1,3 @@
-# RaspberryPi
-Raspberry Pi Oberon Bare Metal Programming
+# Raspberry Pi Bare Metal Programming
+
+Oberon Programming Language kernels
