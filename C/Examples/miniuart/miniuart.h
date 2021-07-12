@@ -4,15 +4,15 @@
 #ifndef __MINIUART_H__
 #define __MINIUART_H__
 
+unsigned int miniuart_tx_ready(void);
 void miniuart_putc(int c);
+unsigned int miniuart_rx_ready(void);
 unsigned int miniuart_getc(void);
 void miniuart_flush_rx(void);
 void miniuart_disable(void);
 
 #define MINIUART_8BIT		(1 << 1)
 #define MINIUART_7BIT		(0 << 1)
-#define MINIUART_INT_ENABLE	(1 << 0)
-#define MINIUART_INT_DISABLE	(0 << 1)
 
 #define MINIUART_115200_BAUD	(1 << 2)
 #define MINIUART_57600_BAUD	(1 << 3)

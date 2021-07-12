@@ -44,8 +44,11 @@
 
 #define AUX_MU_CNTL_REG_OFFS		0x60
 #define		CNTL_RX_ENA_MASK	(1 << 0)
+#define		CNTL_RX_DIS_MASK	(0 << 0)
 #define		CNTL_TX_ENA_MASK	(1 << 1)
-#define		CNTL_RTS_AUTOFLOW_MASK	(1 << 2)
+#define		CNTL_TX_DIS_MASK	(0 << 1)
+#define		CNTL_RTS_AFLOW_ENA_MASK	(1 << 2)
+#define		CNTL_RTS_AFLOW_DIS_MASK	(0 << 2)
 #define		CNTL_TX_CTS_AFLOW_MASK	(1 << 3)
 #define		CNTL_RTS_AF_LVL3_MASK	(0 << 4)
 #define		CNTL_RTS_AF_LVL2_MASK	(1 << 4)
@@ -86,6 +89,8 @@
 
 #define BAUDRATE_REG(baudrate)	(((SYSTEM_CLOCK_FREQUENCY / (baudrate)) / 8) - 1)
 
+#define MINIUART_BYTE_MASK	0xFF
+
 #define GPFSEL1 0x20200004
 #define GPSET0  0x2020001C
 #define GPCLR0  0x20200028
@@ -100,32 +105,36 @@
 static unsigned int miniuart_baudrate_reg(unsigned int);
 static void miniuart_wait(unsigned int);
 
+unsigned int miniuart_tx_ready(void)
+{
+        return readl(AUX_MU_LSR_REG) & LSR_TX_IDLE_MASK;
+}
+
 void miniuart_putc(int c)
 {
 	while (!(readl(AUX_MU_LSR_REG) & LSR_TX_IDLE_MASK))
 		continue;
-	writel(AUX_MU_IO_REG, c);
-
 	if (c == '\n')
-		miniuart_putc('\r');
+		writel(AUX_MU_IO_REG, '\r');
+	writel(AUX_MU_IO_REG, c);
+}
+
+unsigned int miniuart_rx_ready(void)
+{
+        return readl(AUX_MU_LSR_REG) & LSR_RX_DATA_READY_MASK;
 }
 
 unsigned int miniuart_getc(void)
 {
-	return 0;
-/*
         while (!(readl(AUX_MU_LSR_REG) & LSR_RX_DATA_READY_MASK))
 		continue;
-	return readl(AUX_MU_IO_REG) & 0xFF;
-*/
+	return readl(AUX_MU_IO_REG) & MINIUART_BYTE_MASK;
 }
 
 void miniuart_flush_rx(void)
 {
-/*
 	while (readl(AUX_MU_LSR_REG) & LSR_RX_DATA_READY_MASK)
-		miniuart_getc();
-*/
+		readl(AUX_MU_IO_REG);
 }
 
 void miniuart_disable(void)
@@ -138,21 +147,21 @@ void miniuart_enable(unsigned long flags)
 	unsigned int ra;
 
 	ra=readl(GPFSEL1);
-	ra&=~(7<<12); //gpio14
-	ra|=2<<12;    //alt5
+	ra &= ~(7 << 12); // clean gpio14
+	ra |= 2 << 12;    // set alt5 for gpio14
+	ra &= ~(7 << 15); // clean gpio15
+	ra |= 2 << 15;    // set alt5 for gpio15
 	writel(GPFSEL1,ra);
 
 	writel(GPPUD,0);
         miniuart_wait(150);
-	writel(GPPUDCLK0,(1<<14));
+	writel(GPPUDCLK0,(1 << 14) | (1 << 15));
         miniuart_wait(150);
 	writel(GPPUDCLK0,0);
 
 	writel(AUX_ENB_REG, readl(AUX_ENB_REG) | ENB_MINIUART_ENA_MASK);
-	if (flags & MINIUART_INT_ENABLE)
-		writel(AUX_MU_IER_REG, IER_RX_IENA_MASK | IER_TX_IENA_MASK);
-	else
-		writel(AUX_MU_IER_REG, IER_RX_IDIS_MASK | IER_TX_IDIS_MASK);
+	writel(AUX_MU_CNTL_REG, CNTL_RX_DIS_MASK | CNTL_TX_DIS_MASK | CNTL_RTS_AFLOW_DIS_MASK);
+	writel(AUX_MU_IER_REG, IER_RX_IDIS_MASK | IER_TX_IDIS_MASK);
 	writel(AUX_MU_IIR_REG, IIR_CLR_RX_FIFO_MASK | IIR_CLR_TX_FIFO_MASK);
 	if (flags & MINIUART_8BIT)
 		writel(AUX_MU_LCR_REG, LCR_8BIT_MODE_MASK);
