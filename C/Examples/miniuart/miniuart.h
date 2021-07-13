@@ -1,6 +1,7 @@
 /*
  * Copyright 2021 Gerardo Ospina, ngospina@gmail.com
  */
+
 #ifndef __MINIUART_H__
 #define __MINIUART_H__
 

@@ -12,8 +12,10 @@
 
 #define SYSTEM_CLOCK_FREQUENCY	250000000
 
-#define PERIPH_BASE	0x20000000
-#define AUX_PERIPH_BASE	(PERIPH_BASE + 0x215000)
+#define MMIO		0x20000000
+
+#define GP_MMIO		(MMIO + 0x200000)
+#define AUX_MMIO	(MMIO + 0x215000)
 
 static inline void writel(unsigned long addr, unsigned long v)
 {
