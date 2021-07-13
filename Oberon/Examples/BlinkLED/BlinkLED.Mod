@@ -1,19 +1,14 @@
 MODULE BlinkLED; 
 (* task: let the OK/ACT LED blink (on GPIO pin 16), use high level functions *)
 
-IMPORT SYSTEM;
-
 CONST
-	GPIO = 020200000H;
+	MMIO = 20000000H;
+	GPIO = MMIO + 200000H;
 
 VAR
-	gpio* EXTERN GPIO: RECORD (* pinned to GPIO address *)
-		GPFSEL: ARRAY 6 OF SET32;
-		res0: SET32;
-		GPFSET: ARRAY 2 OF SET32;
-		res1: SET32;
-		GPFCLR: ARRAY 2 OF SET32;
-	END;
+	GPFSEL EXTERN GPIO +  0H : ARRAY 6 OF SET32;
+	GPFSET EXTERN GPIO + 1CH : ARRAY 2 OF SET32;
+	GPFCLR EXTERN GPIO + 28H : ARRAY 2 OF SET32;
 
 	(* simple loop to wait for some cycles *)
 	PROCEDURE Wait(n: INTEGER);
@@ -26,15 +21,15 @@ VAR
 	PROCEDURE Blink*;
 	VAR wait: INTEGER; 
 	BEGIN
-		gpio.GPFSET[0] := {16};
+		GPFSET[0] := {16};
 		Wait(512*1024); 
-		gpio.GPFCLR[0] := {16};
+		GPFCLR[0] := {16};
 		Wait(512*1024)
 	END Blink;
 	
 BEGIN
 	(* Select the OK/ACT LED *)
-	gpio.GPFSEL[1] := {18};
+	GPFSEL[1] := {18};
 END BlinkLED.
 
 (* compile the module *)
