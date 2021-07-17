@@ -12,10 +12,10 @@
 
 #define SYSTEM_CLOCK_FREQUENCY	250000000
 
-#define MMIO		0x20000000
+#define IO_BASE	0x20000000
 
-#define GP_MMIO		(MMIO + 0x200000)
-#define AUX_MMIO	(MMIO + 0x215000)
+#define GPIO_BASE	(IO_BASE + 0x200000)
+#define AUX_BASE	(IO_BASE + 0x215000)
 
 static inline void writel(unsigned long addr, unsigned long v)
 {
