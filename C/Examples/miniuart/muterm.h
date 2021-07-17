@@ -24,7 +24,7 @@ void muterm_disable(void);
 #define MUTERM_4800_BAUD	(1 << 8)
 #define MUTERM_2400_BAUD	(1 << 9)
 #define MUTERM_1200_BAUD	(1 << 10)
-#define MUTERM_600_BAUD		(1 << 11)
+#define MUTERM_600_BAUD	(1 << 11)
 
 void muterm_enable(unsigned long flags);
 

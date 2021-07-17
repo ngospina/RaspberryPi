@@ -10,8 +10,8 @@
 
 #define MUTERM_BYTE	0xFF
 
-static unsigned int muterm_baudrate_reg(unsigned int);
-static void muterm_wait(unsigned int);
+static unsigned int baudrate_reg(unsigned int);
+static void wait(unsigned int);
 
 unsigned int muterm_tx_ready(void)
 {
@@ -62,9 +62,9 @@ void muterm_enable(unsigned long flags)
 	writel(GPFSEL1,ra);
 
 	writel(GPPUD, 0);
-        muterm_wait(150);
+        wait(150);
 	writel(GPPUDCLK0, (1 << 14) | (1 << 15));
-        muterm_wait(150);
+        wait(150);
 	writel(GPPUDCLK0, 0);
 
 	writel(AUX_ENB, readl(AUX_ENB) | ENB_MU_ENA);
@@ -76,11 +76,11 @@ void muterm_enable(unsigned long flags)
 	else
 		writel(MU_LCR, LCR_7BIT_MODE);
 	writel(MU_MCR, MCR_RTS_HI);
-	writel(MU_BAUD, muterm_baudrate_reg(flags));
+	writel(MU_BAUD, baudrate_reg(flags));
 	writel(MU_CNTL, CNTL_RX_ENA | CNTL_TX_ENA);
 }
 
-static unsigned int muterm_baudrate_reg(unsigned int flags)
+static unsigned int baudrate_reg(unsigned int flags)
 {
 	if (flags & MUTERM_115200_BAUD)
 		return BAUDRATE(115200);
@@ -106,7 +106,7 @@ static unsigned int muterm_baudrate_reg(unsigned int flags)
 		return BAUDRATE(115200);
 }
 
-static void muterm_wait(unsigned int n)
+static void wait(unsigned int n)
 {
 	unsigned int i;
 

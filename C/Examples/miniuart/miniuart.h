@@ -5,7 +5,7 @@
 #ifndef __MINIUART_H__
 #define __MINIUART_H__
 
-#include "aux.h"
+#include "auxiliary.h"
 
 #define MU_IO		(AUX_BASE + 0x40)
 
